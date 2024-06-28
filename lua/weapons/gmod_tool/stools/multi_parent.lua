@@ -81,9 +81,7 @@ function TOOL:SelectEntity(ent)
 
 	self.SelectedCount = self.SelectedCount + 1
 
-	local cOldColor = ent:GetColor()
-
-	self.OldEntityColors[ent] = cOldColor
+	self.OldEntityColors[ent] = ent:GetColor()
 
 	ent:SetColor(Color(0,255,0,100))
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -150,8 +148,9 @@ end
 function TOOL:RightClick(trace)
 	if CLIENT then return true end
 	local ent = trace.Entity
+	local count = 0
 
-	self:DeselectEntity(ent) -- If the target entity was selected, deselect it before we do anything with it
+	self:DeselectEntity(ent)
 
 	if self.SelectedCount <= 0 or not IsValid(ent) or ent:IsPlayer() or not util.IsValidPhysicsObject(ent, trace.PhysicsBone) or ent:IsWorld() then return false end
 
@@ -159,7 +158,10 @@ function TOOL:RightClick(trace)
 		if not IsValid(ent) then continue end
 
 		for _, v in ipairs(ent:GetChildren()) do
-			self.SelectedEntities[v] = true
+			if IsValid(v) then
+				self.SelectedEntities[v] = true
+				count = count + 1
+			end
 		end
 	end
 
@@ -176,60 +178,44 @@ function TOOL:RightClick(trace)
 
 	for ent2 in pairs(self.SelectedEntities) do
 		if IsValid(ent2) and not ent2:IsPlayer() and not ent2:IsWorld() then
-			local obj_Phys = ent2:GetPhysicsObject()
+			local physObj = ent2:GetPhysicsObject()
 
-			if IsValid(obj_Phys) then
+			if IsValid(physObj) then
 				local tData = {}
 
-				if bRemoveConstraints then
-					constraint.RemoveAll(ent2)
-				end
-
-				if bNoCollide then
-					undo.AddEntity(constraint.NoCollide(ent2, ent, 0, 0))
-				end
-
+				if bRemoveConstraints then constraint.RemoveAll(ent2) end
+				if bNoCollide then undo.AddEntity(constraint.NoCollide(ent2, ent, 0, 0)) end
 				if bDisableCollisions then
 					tData.CollisionGroup = ent2:GetCollisionGroup()
-
 					ent2:SetCollisionGroup(COLLISION_GROUP_WORLD)
 				end
-
-				if bWeld then
-					undo.AddEntity(constraint.Weld(ent2, ent, 0, 0))
-				end
-
+				if bWeld then undo.AddEntity(constraint.Weld(ent2, ent, 0, 0)) end
 				if bWeight then
-					tData.Mass = obj_Phys:GetMass()
-
-					obj_Phys:SetMass(0.1)
-
-					duplicator.StoreEntityModifier(ent2, "mass",{
-						Mass = 0.1
-					})
+					tData.Mass = physObj:GetMass()
+					physObj:SetMass(0.1)
+					duplicator.StoreEntityModifier(ent2, "mass", {Mass = 0.1})
 				end
-
 				if bDisableShadows then
 					tData.DisableShadow = true
-
 					ent2:DrawShadow(false)
 				end
 
-				obj_Phys:EnableMotion(true)
-				obj_Phys:Sleep()
+				physObj:EnableMotion(true)
+				physObj:Sleep()
 
-				ent2:SetColor(v)
+				ent2:SetColor(self.OldEntityColors[ent2])
 				ent2:SetParent(ent)
 
 				self.SelectedEntities[ent2] = nil
+				self.OldEntityColors[ent2] = nil
 
 				undoTbl[ent2] = tData
+
+				count = count + 1
 			end
 		else
-			if IsValid(ent2) then
-				ent2:SetColor(self.OldEntityColors[ent2])
-			end
-
+			if IsValid(ent2) then ent2:SetColor(self.OldEntityColors[ent2]) end
+			self.SelectedCount = self.SelectedCount - 1
 			self.SelectedEntities[ent2] = nil
 			self.OldEntityColors[ent2] = nil
 		end
@@ -238,10 +224,10 @@ function TOOL:RightClick(trace)
 	undo.AddFunction(function(_, undoTbl)
 		for k, v in pairs(undoTbl) do
 			if IsValid(k) then
-				local obj_Phys = k:GetPhysicsObject()
+				local physObj = k:GetPhysicsObject()
 
-				if IsValid(obj_Phys) then
-					obj_Phys:EnableMotion(false)
+				if IsValid(physObj) then
+					physObj:EnableMotion(false)
 
 					k:SetParent(nil)
 					k:SetColor(k:GetColor())
@@ -250,7 +236,7 @@ function TOOL:RightClick(trace)
 					k:SetPos(k:GetPos())
 
 					if v.Mass then
-						obj_Phys:SetMass(v.Mass)
+						physObj:SetMass(v.Mass)
 					end
 
 					if v.CollisionGroup then
@@ -268,6 +254,14 @@ function TOOL:RightClick(trace)
 	undo.SetPlayer(self:GetOwner())
 	undo.Finish()
 
+	local result = self.SelectedCount - count
+	if result > 0 then
+		owner:PrintMessage(HUD_PRINTTALK, result .. "entities failed to parent.")
+		self.SelectedCount = result
+	else
+		self.SelectedCount = 0
+	end
+
 	self.SelectedEntities = {}
 	self.OldEntityColors = {}
 
@@ -281,7 +275,7 @@ function TOOL:Reload()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 
-		ent:SetColor(self.OldEntityColors[Key])
+		ent:SetColor(self.OldEntityColors[ent])
 	end
 
 	self.SelectedCount = 0

@@ -7,11 +7,16 @@ if CLIENT then
 	language.Add("tool.multi_unparent.left","Primary: Add an entity to the selection")
 	language.Add("tool.multi_unparent.right","Secondary: Unparent all selected entities")
 	language.Add("tool.multi_unparent.reload","Reload: Clear selected entities")
+
+	language.Add("tool.multi_parent.left_use","Primary + Use: Select entities in an area")
 end
 
 TOOL.Information = {
 	{
 		name = "left"
+	},
+	{
+		name = "left_use"
 	},
 	{
 		name = "right"
