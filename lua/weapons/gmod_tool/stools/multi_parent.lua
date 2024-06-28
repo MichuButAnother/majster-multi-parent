@@ -60,12 +60,10 @@ TOOL.OldEntityColors = {}
 local entMeta = FindMetaTable("Entity")
 
 local getOwner = function(ent)
-	-- CPPI is a standard at this point, most (if not all) prop protection addons support it by now
 	if entMeta.CPPIGetOwner then
 		return ent:CPPIGetOwner()
 	end
 
-	-- Used by some other things such as wiremod, HL2 related stuff, etc.. Not very reliable but w/e
 	return ent:GetOwner()
 end
 
