@@ -150,6 +150,10 @@ end
 
 function TOOL:Think()
 	for ent in pairs(self.SelectedEntities) do
-		if not IsValid(ent) then self:DeselectEntity(ent) end
+		if not IsValid(ent) then 
+			self.SelectedEntities[ent] = nil
+			self.SelectedCount = self.SelectedCount - 1
+			self.OldEntityColors[ent] = nil
+		end
 	end
 end
