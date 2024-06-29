@@ -134,8 +134,16 @@ function TOOL:LeftClick(trace)
 		ply:PrintMessage(HUD_PRINTTALK, "Multi-Parent: " .. selected .. " entities were selected.")
 	elseif self.SelectedEntities[ent] then
 		self:DeselectEntity(ent)
+
+		for _, v in ipairs(ent:GetChildren()) do
+			if IsValid(v) then self:DeselectEntity(v) end
+		end
 	else
 		self:SelectEntity(ent)
+
+		for _, v in ipairs(ent:GetChildren()) do
+			if IsValid(v) then self:SelectEntity(v) end
+		end
 	end
 
 	return true
@@ -149,17 +157,6 @@ function TOOL:RightClick(trace)
 	self:DeselectEntity(ent)
 
 	if self.SelectedCount <= 0 or not IsValid(ent) or ent:IsPlayer() or not util.IsValidPhysicsObject(ent, trace.PhysicsBone) or ent:IsWorld() then return false end
-
-	for ent in pairs(self.SelectedEntities) do -- Add Children to the selected entity table
-		if not IsValid(ent) then continue end
-
-		for _, v in ipairs(ent:GetChildren()) do
-			if IsValid(v) then
-				self.SelectedEntities[v] = true
-				count = count + 1
-			end
-		end
-	end
 
 	local bNoCollide = 			tobool(self:GetClientNumber("nocollide"))
 	local bDisableCollisions = 	tobool(self:GetClientNumber("disablecollisions"))
@@ -231,17 +228,9 @@ function TOOL:RightClick(trace)
 					k:SetAngles(k:GetAngles())
 					k:SetPos(k:GetPos())
 
-					if v.Mass then
-						physObj:SetMass(v.Mass)
-					end
-
-					if v.CollisionGroup then
-						k:SetCollisionGroup(v.CollisionGroup)
-					end
-
-					if v.DisableShadow then
-						k:DrawShadow(true)
-					end
+					if v.Mass then physObj:SetMass(v.Mass) end
+					if v.CollisionGroup then k:SetCollisionGroup(v.CollisionGroup) end
+					if v.DisableShadow then k:DrawShadow(true) end
 				end
 			end
 		end
