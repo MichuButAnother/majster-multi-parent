@@ -66,8 +66,8 @@ function TOOL:DeselectEntity(ent)
 
 	self.SelectedCount = self.SelectedCount - 1
 
-	self.OldEntityColors[ent] = nil
 	self.SelectedEntities[ent] = nil
+	self.OldEntityColors[ent] = nil
 end
 
 function TOOL:LeftClick(trace)
@@ -110,7 +110,7 @@ function TOOL:RightClick(trace)
 	local owner = self:GetOwner()
 	local count = 0
 
-	for ent in pairs(self.SelectedEntities) do -- Unparent!
+	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 
 		ent:SetParent()
@@ -124,16 +124,9 @@ function TOOL:RightClick(trace)
 
 	owner:PrintMessage(HUD_PRINTTALK, "Multi-Unparent: " .. count .. " entities were unparented.")
 
-	local result = self.SelectedCount - count
-	if result > 0 then
-		owner:PrintMessage(HUD_PRINTTALK, result .. " entities failed to unparent.")
-		self.SelectedCount = result
-	else
-		self.SelectedCount = 0
+	if self.SelectedCount > 0 then
+		owner:PrintMessage(HUD_PRINTTALK, self.SelectedCount .. " entities failed to unparent.")
 	end
-
-	self.SelectedEntities = {}
-	self.OldEntityColors = {}
 
 	return true
 end
@@ -144,7 +137,6 @@ function TOOL:Reload()
 
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
-
 		ent:SetColor(self.OldEntityColors[ent])
 	end
 
