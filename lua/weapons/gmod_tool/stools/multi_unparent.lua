@@ -8,7 +8,7 @@ if CLIENT then
 	language.Add("tool.multi_unparent.right","Secondary: Unparent all selected entities")
 	language.Add("tool.multi_unparent.reload","Reload: Clear selected entities")
 
-	language.Add("tool.multi_parent.left_use","Primary + Use: Select entities in an area")
+	language.Add("tool.multi_unparent.left_use","Primary + Use: Select entities in an area")
 end
 
 TOOL.Information = {
@@ -93,7 +93,7 @@ function TOOL:LeftClick(trace)
 			end
 		end
 
-		ply:PrintMessage(HUD_PRINTTALK,"Multi-Parent: " .. selected .. " entities were selected.")
+		ply:PrintMessage(HUD_PRINTTALK, "Multi-Parent: " .. selected .. " entities were selected.")
 	elseif self.SelectedEntities[ent] then
 		self:DeselectEntity(ent)
 	else
@@ -126,7 +126,7 @@ function TOOL:RightClick(trace)
 
 	local result = self.SelectedCount - count
 	if result > 0 then
-		owner:PrintMessage(HUD_PRINTTALK, result .. "entities failed to unparent.")
+		owner:PrintMessage(HUD_PRINTTALK, result .. " entities failed to unparent.")
 		self.SelectedCount = result
 	else
 		self.SelectedCount = 0

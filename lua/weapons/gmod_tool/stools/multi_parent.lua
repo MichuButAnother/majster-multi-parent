@@ -107,6 +107,7 @@ function TOOL:LeftClick(trace)
 	local ply = self:GetOwner()
 	if not ply:KeyDown(IN_USE) and ent:IsWorld() then return false end
 
+	print("chuj 3")
 	if ply:KeyDown(IN_USE) then
 		local radius = math.Clamp(self:GetClientNumber("radius"), 64, 1024)
 		local selected = 0
@@ -121,21 +122,17 @@ function TOOL:LeftClick(trace)
 			end
 		end
 
-		ply:PrintMessage(HUD_PRINTTALK,"Multi-Parent: " .. selected .. " entities were selected.")
+		ply:PrintMessage(HUD_PRINTTALK, "Multi-Parent: " .. selected .. " entities were selected.")
 	elseif ply:KeyDown(IN_SPEED) then
 		local selected = 0
 
-		for _,v in pairs(constraint.GetAllConstrainedEntities(ent)) do
+		for _, v in pairs(constraint.GetAllConstrainedEntities(ent)) do
 			self:SelectEntity(v)
 
 			selected = selected + 1
 		end
 
-		if selected ~= 1 then
-			ply:PrintMessage(HUD_PRINTTALK,"Multi-Parent: " .. selected .. " entities were selected.")
-		else
-			ply:PrintMessage(HUD_PRINTTALK,"Multi-Parent: One entity was selected.")
-		end
+		ply:PrintMessage(HUD_PRINTTALK, "Multi-Parent: " .. selected .. " entities were selected.")
 	elseif self.SelectedEntities[ent] then
 		self:DeselectEntity(ent)
 	else
@@ -215,7 +212,7 @@ function TOOL:RightClick(trace)
 			end
 		else
 			if IsValid(ent2) then ent2:SetColor(self.OldEntityColors[ent2]) end
-			self.SelectedCount = self.SelectedCount - 1
+
 			self.SelectedEntities[ent2] = nil
 			self.OldEntityColors[ent2] = nil
 		end
@@ -256,7 +253,7 @@ function TOOL:RightClick(trace)
 
 	local result = self.SelectedCount - count
 	if result > 0 then
-		owner:PrintMessage(HUD_PRINTTALK, result .. "entities failed to parent.")
+		self:GetOwner():PrintMessage(HUD_PRINTTALK, result .. " entities failed to parent.")
 		self.SelectedCount = result
 	else
 		self.SelectedCount = 0
