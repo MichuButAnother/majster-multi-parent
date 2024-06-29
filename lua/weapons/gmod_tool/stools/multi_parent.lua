@@ -268,8 +268,8 @@ function TOOL:Think()
 end
 
 if CLIENT then
-	function TOOL.BuildCPanel(obj_Panel)
-		obj_Panel:AddControl("Slider", {
+	function TOOL.BuildCPanel(panel)
+		panel:AddControl("Slider", {
 			Label = "Auto Select Radius:",
 			Type = "integer",
 			Min = "64",
@@ -277,36 +277,36 @@ if CLIENT then
 			Command = "multi_parent_radius"
 		})
 
-		obj_Panel:AddControl("Checkbox", {
+		panel:AddControl("Checkbox", {
 			Label = "#tool.multi_parent.removeconstraints",
 			Command = "multi_parent_removeconstraints",
 			Help = true
 		})
 
-		obj_Panel:AddControl("Checkbox", {
+		panel:AddControl("Checkbox", {
 			Label = "#tool.multi_parent.nocollide",
 			Command = "multi_parent_nocollide",
 			Help = true
 		})
 
-		obj_Panel:AddControl("Checkbox", {
+		panel:AddControl("Checkbox", {
 			Label = "#tool.multi_parent.weld",
 			Command = "multi_parent_weld",
 			Help = true
 		})
 
-		obj_Panel:AddControl("Checkbox", {
+		panel:AddControl("Checkbox", {
 			Label = "#tool.multi_parent.weight",
 			Command = "multi_parent_weight",
 			Help = true
 		})
 
-		obj_Panel:AddControl("Checkbox", {
+		panel:AddControl("Checkbox", {
 			Label = "#tool.multi_parent.disablecollisions",
 			Command = "multi_parent_disablecollisions",
 		})
 
-		obj_Panel:AddControl("Checkbox", {
+		panel:AddControl("Checkbox", {
 			Label = "#tool.multi_parent.disableshadows",
 			Command = "multi_parent_disableshadows"
 		})

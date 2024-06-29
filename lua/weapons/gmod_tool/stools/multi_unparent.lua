@@ -26,6 +26,8 @@ TOOL.Information = {
 	}
 }
 
+TOOL.ClientConVar["radius"] = "512"
+
 TOOL.SelectedEntities = {}
 TOOL.SelectedCount = 0
 TOOL.OldEntityColors = {}
@@ -155,5 +157,17 @@ function TOOL:Think()
 			self.SelectedCount = self.SelectedCount - 1
 			self.OldEntityColors[ent] = nil
 		end
+	end
+end
+
+if CLIENT then
+	function TOOL.BuildCPanel(panel)
+		panel:AddControl("Slider", {
+			Label = "Auto Select Radius:",
+			Type = "integer",
+			Min = "64",
+			Max = "1024",
+			Command = "multi_unparent_radius"
+		})
 	end
 end
