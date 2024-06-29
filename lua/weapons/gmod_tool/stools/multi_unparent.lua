@@ -116,6 +116,7 @@ function TOOL:RightClick(trace)
 		if not IsValid(ent) then continue end
 
 		ent:SetParent(nil)
+		ent:SetPos(ent:GetPos())
 		self:DeselectEntity(ent)
 
 		local physObj = ent:GetPhysicsObject()
