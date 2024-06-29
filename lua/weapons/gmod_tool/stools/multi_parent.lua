@@ -259,11 +259,7 @@ end
 
 function TOOL:Think()
 	for ent in pairs(self.SelectedEntities) do
-		if not IsValid(ent) then self.SelectedEntities[ent] = nil end
-	end
-
-	for ent in pairs(self.OldEntityColors) do
-		if not IsValid(ent) then self.OldEntityColors[ent] = nil end
+		if not IsValid(ent) then self:DeselectEntity(ent) end
 	end
 end
 
