@@ -2,7 +2,7 @@ TOOL.Category = "Constraints"
 TOOL.Name = "Multi-Unparent"
 
 if CLIENT then
-	language.Add("tool.multi_unparent.name","Multi-Unparent (Remastered)")
+	language.Add("tool.multi_unparent.name","Multi-Unparent 2.0")
 	language.Add("tool.multi_unparent.desc","Unparent multiple entities")
 	language.Add("tool.multi_unparent.left","Primary: Add an entity to the selection")
 	language.Add("tool.multi_unparent.right","Secondary: Unparent all selected entities")

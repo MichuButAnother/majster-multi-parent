@@ -2,7 +2,7 @@ TOOL.Category = "Constraints"
 TOOL.Name = "Multi-Parent"
 
 if CLIENT then
-	language.Add("tool.multi_parent.name","Multi-Parent (Remastered)")
+	language.Add("tool.multi_parent.name","Multi-Parent 2.0")
 	language.Add("tool.multi_parent.desc","Parent multiple entities to one entity")
 	language.Add("tool.multi_parent.left","Primary: Add an entity to the selection")
 	language.Add("tool.multi_parent.right","Secondary: Parent all selected entities to the entity")
@@ -107,7 +107,6 @@ function TOOL:LeftClick(trace)
 	local ply = self:GetOwner()
 	if not ply:KeyDown(IN_USE) and ent:IsWorld() then return false end
 
-	print("chuj 3")
 	if ply:KeyDown(IN_USE) then
 		local radius = math.Clamp(self:GetClientNumber("radius"), 64, 1024)
 		local selected = 0
