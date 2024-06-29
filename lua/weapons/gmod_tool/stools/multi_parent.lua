@@ -69,7 +69,7 @@ end
 
 local selection_blacklist = {
 	["player"] = true,
-	["predicted_viewmodel"] = true, -- Some of these may not be needed, whatever. (idk what does this mean but whatever, i'll just let it sit here)
+	["predicted_viewmodel"] = true,
 	["gmod_tool"] = true,
 	["none"] = true
 }
@@ -90,12 +90,12 @@ end
 function TOOL:DeselectEntity(ent)
 	if not self.SelectedEntities[ent] then return end
 
-	ent:SetColor(self.OldEntityColors[ent])
+	ent:SetColor(self.OldEntityColors[ent] or Color(255, 255, 255, 255))
 
 	self.SelectedCount = self.SelectedCount - 1
 
-	self.OldEntityColors[ent] = nil
 	self.SelectedEntities[ent] = nil
+	self.OldEntityColors[ent] = nil
 end
 
 function TOOL:LeftClick(trace)
@@ -152,7 +152,6 @@ end
 function TOOL:RightClick(trace)
 	if CLIENT then return true end
 	local ent = trace.Entity
-	local count = 0
 
 	self:DeselectEntity(ent)
 
@@ -196,15 +195,11 @@ function TOOL:RightClick(trace)
 				physObj:EnableMotion(true)
 				physObj:Sleep()
 
-				ent2:SetColor(self.OldEntityColors[ent2])
 				ent2:SetParent(ent)
 
-				self.SelectedEntities[ent2] = nil
-				self.OldEntityColors[ent2] = nil
+				self:DeselectEntity(ent2)
 
 				undoTbl[ent2] = tData
-
-				count = count + 1
 			end
 		else
 			if IsValid(ent2) then ent2:SetColor(self.OldEntityColors[ent2]) end
@@ -239,16 +234,9 @@ function TOOL:RightClick(trace)
 	undo.SetPlayer(self:GetOwner())
 	undo.Finish()
 
-	local result = self.SelectedCount - count
-	if result > 0 then
-		self:GetOwner():PrintMessage(HUD_PRINTTALK, result .. " entities failed to parent.")
-		self.SelectedCount = result
-	else
-		self.SelectedCount = 0
+	if self.SelectedCount > 0 then
+		owner:PrintMessage(HUD_PRINTTALK, self.SelectedCount .. " entities failed to parent.")
 	end
-
-	self.SelectedEntities = {}
-	self.OldEntityColors = {}
 
 	return true
 end

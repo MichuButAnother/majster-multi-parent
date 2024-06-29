@@ -137,6 +137,7 @@ function TOOL:Reload()
 
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
+		
 		ent:SetColor(self.OldEntityColors[ent])
 	end
 
