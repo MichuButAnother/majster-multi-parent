@@ -115,7 +115,7 @@ function TOOL:RightClick(trace)
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 
-		ent:SetParent()
+		ent:SetParent(nil)
 		self:DeselectEntity(ent)
 
 		local physObj = ent:GetPhysicsObject()

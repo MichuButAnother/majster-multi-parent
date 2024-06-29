@@ -217,14 +217,11 @@ function TOOL:RightClick(trace)
 					physObj:EnableMotion(false)
 
 					k:SetParent(nil)
-					k:SetColor(k:GetColor())
-					k:SetMaterial(k:GetMaterial())
-					k:SetAngles(k:GetAngles())
-					k:SetPos(k:GetPos())
-
-					if v.Mass then physObj:SetMass(v.Mass) end
-					if v.CollisionGroup then k:SetCollisionGroup(v.CollisionGroup) end
-					if v.DisableShadow then k:DrawShadow(true) end
+					
+					local tbl = v:GetTable()
+					if tbl.Mass then physObj:SetMass(v.Mass) end
+					if tbl.CollisionGroup then k:SetCollisionGroup(v.CollisionGroup) end
+					if tbl.DisableShadow then k:DrawShadow(true) end
 				end
 			end
 		end
