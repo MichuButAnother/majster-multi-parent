@@ -126,9 +126,13 @@ function TOOL:LeftClick(trace)
 		local selected = 0
 
 		for _, v in pairs(constraint.GetAllConstrainedEntities(ent)) do
-			self:SelectEntity(v)
+			if not IsValid(v) or v:IsWeapon() or selection_blacklist[v:GetClass()] then continue end
 
-			selected = selected + 1
+			if IsValid(v) and not self.SelectedEntities[v] and getOwner(ent) == ply then
+				self:SelectEntity(v)
+
+				selected = selected + 1
+			end
 		end
 
 		ply:PrintMessage(HUD_PRINTTALK, "Multi-Parent: " .. selected .. " entities were selected.")
@@ -201,11 +205,6 @@ function TOOL:RightClick(trace)
 
 				undoTbl[ent2] = tData
 			end
-		else
-			if IsValid(ent2) then ent2:SetColor(self.OldEntityColors[ent2]) end
-
-			self.SelectedEntities[ent2] = nil
-			self.OldEntityColors[ent2] = nil
 		end
 	end
 
