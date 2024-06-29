@@ -216,8 +216,9 @@ function TOOL:RightClick(trace)
 				if IsValid(physObj) then
 					physObj:EnableMotion(false)
 
-					k:SetParent(nil)
-					
+					k:SetParent()
+					k:SetPos(k:GetPos())
+
 					local tbl = v:GetTable()
 					if tbl.Mass then physObj:SetMass(v.Mass) end
 					if tbl.CollisionGroup then k:SetCollisionGroup(v.CollisionGroup) end

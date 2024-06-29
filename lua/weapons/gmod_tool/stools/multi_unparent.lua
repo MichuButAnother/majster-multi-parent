@@ -115,7 +115,7 @@ function TOOL:RightClick(trace)
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 
-		ent:SetParent(nil)
+		ent:SetParent()
 		ent:SetPos(ent:GetPos())
 		self:DeselectEntity(ent)
 
