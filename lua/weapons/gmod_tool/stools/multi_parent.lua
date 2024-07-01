@@ -231,7 +231,7 @@ function TOOL:RightClick(trace)
 	undo.Finish()
 
 	if self.SelectedCount > 0 then
-		owner:PrintMessage(HUD_PRINTTALK, self.SelectedCount .. " entities failed to parent.")
+		self:GetOwner():PrintMessage(HUD_PRINTTALK, self.SelectedCount .. " entities failed to parent.")
 	end
 
 	return true
