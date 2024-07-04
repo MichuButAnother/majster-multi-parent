@@ -131,7 +131,7 @@ end
 
 function TOOL:Reload()
 	if CLIENT then return true end
-	if table.Count(self.SelectedEntities) then return end
+	if table.Count(self.SelectedEntities) <= 0 then return false end
 
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
