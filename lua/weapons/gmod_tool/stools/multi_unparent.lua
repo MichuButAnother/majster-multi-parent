@@ -136,7 +136,8 @@ function TOOL:Reload()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 		
-		ent:SetColor(self.OldEntityColors[ent])
+		ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
+		ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
 	end
 
 	self.SelectedEntities = {}
