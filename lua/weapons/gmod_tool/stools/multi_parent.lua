@@ -54,7 +54,6 @@ TOOL.ClientConVar["radius"] = "512"
 TOOL.ClientConVar["disableshadows"] = "0"
 
 TOOL.SelectedEntities = {}
-TOOL.SelectedCount = 0
 TOOL.OldEntityColors = {}
 
 local entMeta = FindMetaTable("Entity")
@@ -78,10 +77,7 @@ function TOOL:SelectEntity(ent)
 	if self.SelectedEntities[ent] then return end
 
 	self.SelectedEntities[ent] = true
-
-	self.SelectedCount = self.SelectedCount + 1
-
-	self.OldEntityColors[ent] = ent:GetColor()
+	self.OldEntityColors[ent] = {ent:GetColor(), ent:GetRenderMode()}
 
 	ent:SetColor(Color(0,255,0,100))
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -90,9 +86,8 @@ end
 function TOOL:DeselectEntity(ent)
 	if not self.SelectedEntities[ent] then return end
 
-	ent:SetColor(self.OldEntityColors[ent] or Color(255, 255, 255, 255))
-
-	self.SelectedCount = self.SelectedCount - 1
+	ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
+	ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
 
 	self.SelectedEntities[ent] = nil
 	self.OldEntityColors[ent] = nil
@@ -159,7 +154,7 @@ function TOOL:RightClick(trace)
 
 	self:DeselectEntity(ent)
 
-	if self.SelectedCount <= 0 or not IsValid(ent) or ent:IsPlayer() or not util.IsValidPhysicsObject(ent, trace.PhysicsBone) or ent:IsWorld() then return false end
+	if table.Count(self.SelectedEntities) <= 0 or not IsValid(ent) or ent:IsPlayer() or not util.IsValidPhysicsObject(ent, trace.PhysicsBone) or ent:IsWorld() then return false end
 
 	local bNoCollide = 			tobool(self:GetClientNumber("nocollide"))
 	local bDisableCollisions = 	tobool(self:GetClientNumber("disablecollisions"))
@@ -230,7 +225,7 @@ function TOOL:RightClick(trace)
 	undo.SetPlayer(self:GetOwner())
 	undo.Finish()
 
-	if self.SelectedCount > 0 then
+	if table.Count(self.SelectedEntities) then
 		self:GetOwner():PrintMessage(HUD_PRINTTALK, self.SelectedCount .. " entities failed to parent.")
 	end
 
@@ -239,15 +234,15 @@ end
 
 function TOOL:Reload()
 	if CLIENT then return true end
-	if self.SelectedCount <= 0 then return end
+	if table.Count(self.SelectedEntities) <= 0 then return end
 
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 
-		ent:SetColor(self.OldEntityColors[ent])
+		ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
+		ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
 	end
 
-	self.SelectedCount = 0
 	self.SelectedEntities = {}
 	self.OldEntityColors = {}
 
@@ -258,7 +253,6 @@ function TOOL:Think()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then 
 			self.SelectedEntities[ent] = nil
-			self.SelectedCount = self.SelectedCount - 1
 			self.OldEntityColors[ent] = nil
 		end
 	end
