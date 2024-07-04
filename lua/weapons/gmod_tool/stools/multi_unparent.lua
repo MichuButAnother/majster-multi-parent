@@ -29,7 +29,6 @@ TOOL.Information = {
 TOOL.ClientConVar["radius"] = "512"
 
 TOOL.SelectedEntities = {}
-TOOL.SelectedCount = 0
 TOOL.OldEntityColors = {}
 
 local entMeta = FindMetaTable("Entity")
@@ -52,10 +51,7 @@ function TOOL:SelectEntity(ent)
 	if self.SelectedEntities[ent] then return end
 
 	self.SelectedEntities[ent] = true
-
-	self.SelectedCount = self.SelectedCount + 1
-
-	self.OldEntityColors[ent] = ent:GetColor()
+	self.OldEntityColors[ent] = {ent:GetColor(), ent:GetRenderMode()}
 
 	ent:SetColor(Color(255, 0, 0, 100))
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -64,9 +60,8 @@ end
 function TOOL:DeselectEntity(ent)
 	if not self.SelectedEntities[ent] then return end
 
-	ent:SetColor(self.OldEntityColors[ent] or Color(255, 255, 255, 255))
-
-	self.SelectedCount = self.SelectedCount - 1
+	ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
+	ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
 
 	self.SelectedEntities[ent] = nil
 	self.OldEntityColors[ent] = nil
@@ -107,7 +102,7 @@ end
 
 function TOOL:RightClick(trace)
 	if CLIENT then return true end
-	if self.SelectedCount <= 0 then return false end
+	if table.Count(self.SelectedEntities) <= 0 then return false end
 
 	local owner = self:GetOwner()
 	local count = 0
@@ -127,8 +122,9 @@ function TOOL:RightClick(trace)
 
 	owner:PrintMessage(HUD_PRINTTALK, "Multi-Unparent: " .. count .. " entities were unparented.")
 
-	if self.SelectedCount > 0 then
-		owner:PrintMessage(HUD_PRINTTALK, self.SelectedCount .. " entities failed to unparent.")
+	local result = table.Count(self.SelectedEntities)
+	if result > 0 then
+		owner:PrintMessage(HUD_PRINTTALK, result .. " entities failed to unparent.")
 	end
 
 	return true
@@ -136,7 +132,7 @@ end
 
 function TOOL:Reload()
 	if CLIENT then return true end
-	if self.SelectedCount <= 0 then return end
+	if table.Count(self.SelectedEntities) then return end
 
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
@@ -144,7 +140,6 @@ function TOOL:Reload()
 		ent:SetColor(self.OldEntityColors[ent])
 	end
 
-	self.SelectedCount = 0
 	self.SelectedEntities = {}
 	self.OldEntityColors = {}
 
@@ -155,7 +150,6 @@ function TOOL:Think()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then 
 			self.SelectedEntities[ent] = nil
-			self.SelectedCount = self.SelectedCount - 1
 			self.OldEntityColors[ent] = nil
 		end
 	end

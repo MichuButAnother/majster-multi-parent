@@ -225,8 +225,9 @@ function TOOL:RightClick(trace)
 	undo.SetPlayer(self:GetOwner())
 	undo.Finish()
 
-	if table.Count(self.SelectedEntities) then
-		self:GetOwner():PrintMessage(HUD_PRINTTALK, self.SelectedCount .. " entities failed to parent.")
+	local result = table.Count(self.SelectedEntities)
+	if result > 0 then
+		owner:PrintMessage(HUD_PRINTTALK, result .. " entities failed to unparent.")
 	end
 
 	return true
