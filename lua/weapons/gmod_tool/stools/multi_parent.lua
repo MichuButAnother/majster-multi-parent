@@ -225,7 +225,7 @@ function TOOL:RightClick(trace)
 
 	local result = table.Count(self.SelectedEntities)
 	if result > 0 then
-		owner:PrintMessage(HUD_PRINTTALK, result .. " entities failed to unparent.")
+		self:GetOwner():PrintMessage(HUD_PRINTTALK, result .. " entities failed to unparent.")
 	end
 
 	return true
