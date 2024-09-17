@@ -57,7 +57,6 @@ TOOL.SelectedEntities = {}
 TOOL.OldEntityColors = {}
 
 local entMeta = FindMetaTable("Entity")
-
 local getOwner = function(ent)
 	if entMeta.CPPIGetOwner then
 		return ent:CPPIGetOwner()
@@ -66,6 +65,7 @@ local getOwner = function(ent)
 	return ent:GetOwner()
 end
 
+local Color = Color
 local selection_blacklist = {
 	["player"] = true,
 	["predicted_viewmodel"] = true,
@@ -79,7 +79,7 @@ function TOOL:SelectEntity(ent)
 	self.SelectedEntities[ent] = true
 	self.OldEntityColors[ent] = {ent:GetColor(), ent:GetRenderMode()}
 
-	ent:SetColor(Color(0,255,0,100))
+	ent:SetColor(Color(0, 255, 0, 100))
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
 end
 
@@ -260,7 +260,7 @@ end
 if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Slider", {
-			Label = "Auto Select Radius:",
+			Label = "Area Select Radius:",
 			Type = "integer",
 			Min = "64",
 			Max = "1024",
