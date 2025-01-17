@@ -2,13 +2,13 @@ TOOL.Category = "Constraints"
 TOOL.Name = "Multi-Unparent"
 
 if CLIENT then
-	language.Add("tool.multi_unparent.name","Multi-Unparent 2.0")
-	language.Add("tool.multi_unparent.desc","Unparent multiple entities")
-	language.Add("tool.multi_unparent.left","Primary: Add an entity to the selection")
-	language.Add("tool.multi_unparent.right","Secondary: Unparent all selected entities")
-	language.Add("tool.multi_unparent.reload","Reload: Clear selected entities")
+	language.Add("tool.multi_unparent.name", "Multi-Unparent 2.0")
+	language.Add("tool.multi_unparent.desc", "Unparent multiple entities")
+	language.Add("tool.multi_unparent.left", "Primary: Select an entity")
+	language.Add("tool.multi_unparent.right", "Secondary: Unparent all selected entities")
+	language.Add("tool.multi_unparent.reload", "Reload: Clear selected entities")
 
-	language.Add("tool.multi_unparent.left_use","Primary + Use: Select entities in an area")
+	language.Add("tool.multi_unparent.left_use", "Primary + Use: Select entities in an area")
 end
 
 TOOL.Information = {
@@ -29,16 +29,14 @@ TOOL.Information = {
 TOOL.ClientConVar["radius"] = "512"
 
 TOOL.SelectedEntities = {}
-TOOL.OldEntityColors = {}
+TOOL.OldEntInfo = {}
 
-local entMeta = FindMetaTable("Entity")
+local ENT = FindMetaTable("Entity")
 local getOwner = function(ent)
-	if entMeta.CPPIGetOwner then return ent:CPPIGetOwner() end
-
+	if ENT.CPPIGetOwner then return ent:CPPIGetOwner() end
 	return ent:GetOwner()
 end
 
-local Color = Color
 local selection_blacklist = {
 	["player"] = true,
 	["predicted_viewmodel"] = true,
@@ -50,7 +48,7 @@ function TOOL:SelectEntity(ent)
 	if self.SelectedEntities[ent] then return end
 
 	self.SelectedEntities[ent] = true
-	self.OldEntityColors[ent] = {ent:GetColor(), ent:GetRenderMode()}
+	self.OldEntInfo[ent] = {ent:GetColor(), ent:GetRenderMode()}
 
 	ent:SetColor(Color(255, 0, 0, 100))
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -59,11 +57,11 @@ end
 function TOOL:DeselectEntity(ent)
 	if not self.SelectedEntities[ent] then return end
 
-	ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
-	ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
+	ent:SetColor(self.OldEntInfo[ent][1] or Color(255, 255, 255, 255))
+	ent:SetRenderMode(self.OldEntInfo[ent][2] or RENDERMODE_NORMAL)
 
 	self.SelectedEntities[ent] = nil
-	self.OldEntityColors[ent] = nil
+	self.OldEntInfo[ent] = nil
 end
 
 function TOOL:LeftClick(trace)
@@ -88,7 +86,7 @@ function TOOL:LeftClick(trace)
 			end
 		end
 
-		ply:PrintMessage(HUD_PRINTTALK, "Multi-Parent: " .. selected .. " entities were selected.")
+		ply:PrintMessage(HUD_PRINTTALK, "Multi-Unparent: " .. selected .. " entities were selected.")
 	elseif self.SelectedEntities[ent] then
 		self:DeselectEntity(ent)
 	else
@@ -135,12 +133,12 @@ function TOOL:Reload()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 		
-		ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
-		ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
+		ent:SetColor(self.OldEntInfo[ent][1] or Color(255, 255, 255, 255))
+		ent:SetRenderMode(self.OldEntInfo[ent][2] or RENDERMODE_NORMAL)
 	end
 
 	self.SelectedEntities = {}
-	self.OldEntityColors = {}
+	self.OldEntInfo = {}
 
 	return true
 end
@@ -149,7 +147,7 @@ function TOOL:Think()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then 
 			self.SelectedEntities[ent] = nil
-			self.OldEntityColors[ent] = nil
+			self.OldEntInfo[ent] = nil
 		end
 	end
 end

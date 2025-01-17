@@ -2,11 +2,13 @@ TOOL.Category = "Constraints"
 TOOL.Name = "Multi-Parent"
 
 if CLIENT then
-	language.Add("tool.multi_parent.name","Multi-Parent 2.0")
-	language.Add("tool.multi_parent.desc","Parent multiple entities to one entity")
-	language.Add("tool.multi_parent.left","Primary: Add an entity to the selection")
-	language.Add("tool.multi_parent.right","Secondary: Parent all selected entities to the entity")
-	language.Add("tool.multi_parent.reload","Reload: Clear selected entities")
+	language.Add("tool.multi_parent.name", "Multi-Parent 2.0")
+	language.Add("tool.multi_parent.desc", "Parent multiple entities to one entity")
+	language.Add("tool.multi_parent.left", "Primary: Select an entity")
+	language.Add("tool.multi_parent.left_use", "Primary + Use: Select entities in an area ")
+	language.Add("tool.multi_parent.left1", "Primary + Sprint: Select all entities connected to the entity (the whole contraption)")
+	language.Add("tool.multi_parent.right", "Secondary: Parent all selected entities to the entity")
+	language.Add("tool.multi_parent.reload", "Reload: Clear selected entities")
 
 	language.Add("tool.multi_parent.removeconstraints", "Remove constraints before parenting")
 	language.Add("tool.multi_parent.nocollide", "No collide")
@@ -18,12 +20,9 @@ if CLIENT then
 	language.Add("tool.multi_parent.removeconstraints.help", "This can't be undone!")
 	language.Add("tool.multi_parent.nocollide.help", "You will need to area-copy your contraption to duplicate.")
 	language.Add("tool.multi_parent.weld.help", "This will retain the physics on parented props and you will be able to physgun them, but it will cause more lag.")
-	language.Add("tool.multi_parent.weight.help", "Sets the entity's mass to 0.1 before parenting.")
+	language.Add("tool.multi_parent.weight.help", "Sets the mass of the entity to 0.1 before parenting.")
 
-	language.Add("tool.multi_parent.left_use","Primary + Use: Select entities in an area")
-	language.Add("tool.multi_parent.left1","Primary + Sprint: Select all entities connected to the entity (the whole contraption)")
-
-	language.Add("tool.multi_parent.undo","Undone Multi-Parent")
+	language.Add("tool.multi_parent.undo", "Undone Multi-Parent")
 end
 
 TOOL.Information = {
@@ -54,18 +53,14 @@ TOOL.ClientConVar["radius"] = "512"
 TOOL.ClientConVar["disableshadows"] = "0"
 
 TOOL.SelectedEntities = {}
-TOOL.OldEntityColors = {}
+TOOL.OldEntInfo = {}
 
-local entMeta = FindMetaTable("Entity")
+local ENT = FindMetaTable("Entity")
 local getOwner = function(ent)
-	if entMeta.CPPIGetOwner then
-		return ent:CPPIGetOwner()
-	end
-
+	if ENT.CPPIGetOwner then return ent:CPPIGetOwner() end
 	return ent:GetOwner()
 end
 
-local Color = Color
 local selection_blacklist = {
 	["player"] = true,
 	["predicted_viewmodel"] = true,
@@ -77,20 +72,20 @@ function TOOL:SelectEntity(ent)
 	if self.SelectedEntities[ent] then return end
 
 	self.SelectedEntities[ent] = true
-	self.OldEntityColors[ent] = {ent:GetColor(), ent:GetRenderMode()}
+	self.OldEntInfo[ent] = {ent:GetColor(), ent:GetRenderMode()}
 
-	ent:SetColor(Color(0, 255, 0, 100))
+	ent:SetColor(Color(0,255,0,100))
 	ent:SetRenderMode(RENDERMODE_TRANSALPHA)
 end
 
 function TOOL:DeselectEntity(ent)
 	if not self.SelectedEntities[ent] then return end
 
-	ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
-	ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
+	ent:SetColor(self.OldEntInfo[ent][1] or Color(255, 255, 255, 255))
+	ent:SetRenderMode(self.OldEntInfo[ent][2] or RENDERMODE_NORMAL)
 
 	self.SelectedEntities[ent] = nil
-	self.OldEntityColors[ent] = nil
+	self.OldEntInfo[ent] = nil
 end
 
 function TOOL:LeftClick(trace)
@@ -225,7 +220,7 @@ function TOOL:RightClick(trace)
 
 	local result = table.Count(self.SelectedEntities)
 	if result > 0 then
-		self:GetOwner():PrintMessage(HUD_PRINTTALK, result .. " entities failed to unparent.")
+		self:GetOwner():PrintMessage(HUD_PRINTTALK, result .. " entities failed to parent.")
 	end
 
 	return true
@@ -238,12 +233,12 @@ function TOOL:Reload()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
 
-		ent:SetColor(self.OldEntityColors[ent][1] or Color(255, 255, 255, 255))
-		ent:SetRenderMode(self.OldEntityColors[ent][2] or RENDERMODE_NORMAL)
+		ent:SetColor(self.OldEntInfo[ent][1] or Color(255, 255, 255, 255))
+		ent:SetRenderMode(self.OldEntInfo[ent][2] or RENDERMODE_NORMAL)
 	end
 
 	self.SelectedEntities = {}
-	self.OldEntityColors = {}
+	self.OldEntInfo = {}
 
 	return true
 end
@@ -252,7 +247,7 @@ function TOOL:Think()
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then 
 			self.SelectedEntities[ent] = nil
-			self.OldEntityColors[ent] = nil
+			self.OldEntInfo[ent] = nil
 		end
 	end
 end
