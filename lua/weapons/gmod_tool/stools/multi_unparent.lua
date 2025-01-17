@@ -37,13 +37,6 @@ local getOwner = function(ent)
 	return ent:GetOwner()
 end
 
-local selection_blacklist = {
-	["player"] = true,
-	["predicted_viewmodel"] = true,
-	["gmod_tool"] = true,
-	["none"] = true
-}
-
 function TOOL:SelectEntity(ent)
 	if self.SelectedEntities[ent] then return end
 
@@ -78,7 +71,7 @@ function TOOL:LeftClick(trace)
 		local selected = 0
 
 		for _, v in ipairs(ents.FindInSphere(trace.HitPos, radius)) do
-			if not IsValid(v) or selection_blacklist[v:GetClass()] or v:IsPlayer() or v:IsWorld() or v:IsWeapon() then continue end
+			if not IsValid(v) or v:IsPlayer() or v:IsWorld() or v:IsWeapon() then continue end
 
 			if not self.SelectedEntities[v] and getOwner(ent) == ply then
 				self:SelectEntity(v)
@@ -132,7 +125,7 @@ function TOOL:Reload()
 
 	for ent in pairs(self.SelectedEntities) do
 		if not IsValid(ent) then continue end
-		
+
 		ent:SetColor(self.OldEntInfo[ent][1] or Color(255, 255, 255, 255))
 		ent:SetRenderMode(self.OldEntInfo[ent][2] or RENDERMODE_NORMAL)
 	end
